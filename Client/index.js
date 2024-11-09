@@ -66,15 +66,19 @@ document.addEventListener('DOMContentLoaded', async (event) => {
             activeKeys.add(e.key);
         }
 
-        // Send "OK" signal if the spacebar is pressed
-        // if (e.key === ' ' || e.key === 'Space') {
-        //     servo = 1;
-        //     // if (socket.readyState === WebSocket.OPEN) {
-        //     //     socket.send(JSON.stringify({ x, y, servo }));
-        //     // }
-        // } else {
-        //     servo = 0;
-        // }
+        //Send "OK" signal if the spacebar is pressed
+        if (e.key === 'q') {
+            servo = 1;
+            if (socket.readyState === WebSocket.OPEN) {
+                socket.send(JSON.stringify({ x, y, servo }));
+            }
+        }
+        if (e.key == 'w') {
+            servo = 0;
+            if (socket.readyState === WebSocket.OPEN) {
+                socket.send(JSON.stringify({ x, y, servo }));
+            }
+        }
     });
 
     // Listen for keyup events to remove keys from the set
