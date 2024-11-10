@@ -7,7 +7,7 @@ document.addEventListener('DOMContentLoaded', async (event) => {
     let activeKeys = new Set(); // Track pressed keys
 
     // Initialize WebSocket connection
-    let socket = new WebSocket("ws://192.168.0.215:80/direction");
+    let socket = new WebSocket("ws://192.168.1.73:80/direction");
     socket.addEventListener("open", () => {
         socket.send("Hello Server!");
     });

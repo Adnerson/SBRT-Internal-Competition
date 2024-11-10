@@ -7,8 +7,12 @@ import network
 import time
 import json
 
+currentSpeed = 70
+turn = 30
 d2 = Pin(2, Pin.OUT)
 d1 = Pin(18, Pin.OUT)
+d3 = Pin(12, Pin.OUT) # yellow
+d4 = Pin(28, Pin.OUT)
 servo1 = machine.PWM(machine.Pin(17))   # Servo
 servo1.freq(50)
 
@@ -38,11 +42,21 @@ backRight2 = Pin(5, Pin.OUT)
 
 def servo_90():
     servo1.duty_u16(int((1550 / 20000) * 65535))
-    time.sleep(1)
 
 def servo_180():
-    servo1.duty_u16(int((2500 / 20000) * 65535))
-    time.sleep(1)
+    servo1.duty_u16(int((2300 / 20000) * 65535))
+
+def servostuff(servo):
+    if servo == 1:
+        servo_180()
+        currentSpeed = 100
+        d3.low()
+        d4.high()
+    else:
+        servo_90()
+        currentSpeed = 70
+        d3.high()
+        d4.low()
 
 def allOff():
     frontLeft1.low()
@@ -88,6 +102,8 @@ d2.high()
 time.sleep(1)
 d2.low()
 d1.high()
+d3.low()
+d4.low()
 time.sleep(1)
 
 
@@ -112,6 +128,7 @@ if wlan.isconnected():
     d1.high()
     time.sleep(1)
     d1.low()
+    d2.high()
     
 else:
     print("Failed to connect to Wi-Fi. Please check your SSID and password.")
@@ -160,32 +177,32 @@ def move(x, y):
         backLeft1.high()
         frontRight1.high()
         backRight1.high()
-        PWM1.duty_u16(int(100 * 65535 / 100)) #PWM1 left
-        PWM2.duty_u16(int(45 * 65535 / 100)) #pwm2 right
+        PWM1.duty_u16(int(currentSpeed * 65535 / 100)) #PWM1 left
+        PWM2.duty_u16(int(turn * 65535 / 100)) #pwm2 right
     elif x > 0 and y == 0:
         print("right")
         frontLeft1.high()
         backLeft2.high()
         frontRight1.high()
         backRight2.high()
-        PWM1.duty_u16(int(100 * 65535 / 100)) #PWM1 left
-        PWM2.duty_u16(int(100 * 65535 / 100)) #pwm2 right
+        PWM1.duty_u16(int(currentSpeed * 65535 / 100)) #PWM1 left
+        PWM2.duty_u16(int(currentSpeed * 65535 / 100)) #pwm2 right
     elif x < 0 and y == 0:
         print("left")
         frontLeft2.high()
         backLeft1.high()
         frontRight2.high()
         backRight1.high()
-        PWM1.duty_u16(int(100 * 65535 / 100)) #PWM1 left
-        PWM2.duty_u16(int(100 * 65535 / 100)) #pwm2 right
+        PWM1.duty_u16(int(currentSpeed * 65535 / 100)) #PWM1 left
+        PWM2.duty_u16(int(currentSpeed * 65535 / 100)) #pwm2 right
     elif x == 0 and y > 0:
         print("forward")
         frontLeft1.high()
         backLeft1.high()
         frontRight1.high()
         backRight1.high()
-        PWM1.duty_u16(int(100 * 65535 / 100)) #PWM1 left
-        PWM2.duty_u16(int(100 * 65535 / 100)) #pwm2 right
+        PWM1.duty_u16(int(currentSpeed * 65535 / 100)) #PWM1 left
+        PWM2.duty_u16(int(currentSpeed * 65535 / 100)) #pwm2 right
         
     elif x == 0 and y < 0:
         print("backward")
@@ -193,8 +210,8 @@ def move(x, y):
         backLeft2.high()
         frontRight2.high()
         backRight2.high()
-        PWM1.duty_u16(int(100 * 65535 / 100)) #PWM1 left
-        PWM2.duty_u16(int(100 * 65535 / 100)) #pwm2 right
+        PWM1.duty_u16(int(currentSpeed * 65535 / 100)) #PWM1 left
+        PWM2.duty_u16(int(currentSpeed * 65535 / 100)) #pwm2 right
 
     elif x < 0 and y < 0:  # Backward and turn left (left motors slower)
         print("backward and turn left")
@@ -202,8 +219,8 @@ def move(x, y):
         backLeft2.high()
         frontRight2.high()
         backRight2.high()
-        PWM1.duty_u16(int(30 * 65535 / 100)) #PWM1 left
-        PWM2.duty_u16(int(100 * 65535 / 100)) #pwm2 right
+        PWM1.duty_u16(int(turn * 65535 / 100)) #PWM1 left
+        PWM2.duty_u16(int(currentSpeed * 65535 / 100)) #pwm2 right
 
     elif x > 0 and y < 0:  # Backward and turn right (right motors slower)
         print("backward and turn right")
@@ -211,29 +228,18 @@ def move(x, y):
         backLeft2.high()
         frontRight2.high()
         backRight2.high()
-        PWM1.duty_u16(int(100 * 65535 / 100)) #PWM1 left
-        PWM2.duty_u16(int(30 * 65535 / 100)) #pwm2 right
+        PWM1.duty_u16(int(currentSpeed * 65535 / 100)) #PWM1 left
+        PWM2.duty_u16(int(turn * 65535 / 100)) #pwm2 right
 
     elif x < 0 and y > 0:  # Forward and turn left (left motors slower)
         frontLeft1.high()
         backLeft1.high()
         frontRight1.high()
         backRight1.high()
-        PWM1.duty_u16(int(45 * 65535 / 100)) #PWM1 left
-        PWM2.duty_u16(int(100 * 65535 / 100)) #pwm2 right
+        PWM1.duty_u16(int(turn * 65535 / 100)) #PWM1 left
+        PWM2.duty_u16(int(currentSpeed * 65535 / 100)) #pwm2 right
     elif x==0 and y==0:
         allOff()
-
-# def testRight(x, y): #forward right
-#     if x!= 0 or y != 0:
-#         frontLeft1.high()
-#         backLeft1.high()
-#         frontRight1.high()
-#         backRight1.high()
-#         PWM1.duty_u16(int(100 * 65535 / 100)) #PWM1 left
-#         PWM2.duty_u16(int(45 * 65535 / 100)) #pwm2 right
-#     else:
-#         allOff()
 
 @app.get('/direction')
 @with_websocket
@@ -243,17 +249,18 @@ async def index(request, ws):
             data = await ws.receive()
             if not data:
                 break
+            
             try:
                 joystick_data = json.loads(data)
-                    
+                servo = joystick_data.get('servo', 0)
                 x = joystick_data.get('x', 0)
                 y = -1 * joystick_data.get('y', 0)
                 print(data)
-
-                print(x, y)
+                
+                print(x, y, servo)
                 
                 move(x,y)
-                
+                servostuff(servo)
 
             except Exception as e:
                 print(f"no can do: {e}")
@@ -266,4 +273,6 @@ async def index(request, ws):
         await ws.close()
 
 app.run(port=80)
+
+
 
